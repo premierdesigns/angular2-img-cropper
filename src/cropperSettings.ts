@@ -15,6 +15,7 @@ export interface ICropperSettings {
     noFileInput?: boolean;
     allowedFilesRegex?: RegExp;
     rounded: boolean;
+    diamond: boolean;
     keepAspect: boolean;
     preserveSize: boolean;
     cropOnResize: boolean;
@@ -54,6 +55,7 @@ export class CropperSettings implements ICropperSettings {
     public compressRatio:number = 1.0;
 
     private _rounded: boolean = false;
+    private _diamond: boolean = false;
     private _keepAspect: boolean = true;
 
 
@@ -63,6 +65,7 @@ export class CropperSettings implements ICropperSettings {
 
     set rounded(val: boolean) {
         this._rounded = val;
+        this._diamond = !val;
         if (val) {
             this._keepAspect = true;
         }
@@ -71,10 +74,20 @@ export class CropperSettings implements ICropperSettings {
     get rounded(): boolean {
         return this._rounded;
     }
+    set diamond(val: boolean) {
+        this._diamond = val;
+        this._rounded = !val;
+        if (val) {
+            this._keepAspect = true;
+        }
+    }
+    get diamond(): boolean {
+        return this._diamond;
+    }
 
     set keepAspect(val: boolean) {
-        if (val === false && this._rounded) {
-            throw new Error('Cannot set keep aspect to false on rounded cropper. Ellipsis not supported');
+        if (val === false && (this._rounded || this.diamond)) {
+            throw new Error('Cannot set keep aspect to false on rounded or diamond cropper. Ellipsis not supported');
         }
 
         this._keepAspect = val;
