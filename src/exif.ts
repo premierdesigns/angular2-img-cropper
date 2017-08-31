@@ -701,7 +701,7 @@ export class Exif {
         return tags;
     }
 
-    public static getData(img: IImageExtended | HTMLImageElement, callback: Function) {
+    public static getData(img: any | HTMLImageElement, callback: Function) {
 
         if ((img instanceof Image || img instanceof HTMLImageElement) && !img.complete) {
             return false;
