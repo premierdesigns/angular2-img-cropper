@@ -1,4 +1,4 @@
-import {Component, Input, Renderer, ViewChild, ElementRef, Output, EventEmitter, Type, AfterViewInit, OnChanges, OnDestroy, SimpleChanges} from '@angular/core';
+import {Component, Input, Renderer2, ViewChild, ElementRef, Output, EventEmitter, Type, AfterViewInit, OnChanges, OnDestroy, SimpleChanges} from '@angular/core';
 import {ImageCropper} from './imageCropper';
 import {CropperSettings} from './cropperSettings';
 import {Exif} from './exif';
@@ -39,12 +39,12 @@ export class ImageCropperComponent implements AfterViewInit, OnChanges, OnDestro
     public croppedHeight:number;
     public intervalRef:number;
     public raf:number;
-    public renderer:Renderer;
+    public renderer:Renderer2;
     public windowListener: EventListenerObject;
 
     private isCropPositionUpdateNeeded:boolean;
 
-    constructor(renderer:Renderer) {
+    constructor(renderer:Renderer2) {
         this.renderer = renderer;
     }
 
@@ -55,11 +55,13 @@ export class ImageCropperComponent implements AfterViewInit, OnChanges, OnDestro
             this.settings = new CropperSettings();
         }
 
-        this.renderer.setElementAttribute(canvas, 'class', this.settings.cropperClass);
+        if (this.settings.cropperClass) {
+            this.renderer.setAttribute(canvas, 'class', this.settings.cropperClass);
+        }
 
         if (!this.settings.dynamicSizing) {
-            this.renderer.setElementAttribute(canvas, 'width', this.settings.canvasWidth.toString());
-            this.renderer.setElementAttribute(canvas, 'height', this.settings.canvasHeight.toString());
+            this.renderer.setAttribute(canvas, 'width', this.settings.canvasWidth.toString());
+            this.renderer.setAttribute(canvas, 'height', this.settings.canvasHeight.toString());
         } else {
             this.windowListener = this.resize.bind(this);
             window.addEventListener('resize', this.windowListener);
@@ -135,11 +137,10 @@ export class ImageCropperComponent implements AfterViewInit, OnChanges, OnDestro
         if (this.settings.allowedFilesRegex.test(file.name)) {
             let image:any = new Image();
             let fileReader:FileReader = new FileReader();
-            let that = this;
 
-            fileReader.addEventListener('loadend', function (loadEvent:any) {
-                image.addEventListener('load', function() {
-                    that.setImage(image);
+            fileReader.addEventListener('loadend', (loadEvent:any) => {
+                image.addEventListener('load', () => {
+                    this.setImage(image);
                 });
                 image.src = loadEvent.target.result;
             });
@@ -157,25 +158,23 @@ export class ImageCropperComponent implements AfterViewInit, OnChanges, OnDestro
 
     public reset():void {
         this.cropper.reset();
-        this.renderer.setElementAttribute(this.cropcanvas.nativeElement, 'class', this.settings.cropperClass);
+        this.renderer.setAttribute(this.cropcanvas.nativeElement, 'class', this.settings.cropperClass);
         this.image.image = this.cropper.getCroppedImageHelper().src;
     }
 
     public setImage(image:HTMLImageElement, newBounds:any = null) {
-        let self = this;
-        this.renderer.setElementAttribute(this.cropcanvas.nativeElement, 'class', `${this.settings.cropperClass} ${this.settings.croppingClass}`);
+        this.renderer.setAttribute(this.cropcanvas.nativeElement, 'class', `${this.settings.cropperClass} ${this.settings.croppingClass}`);
         this.raf = window.requestAnimationFrame(() => {
-            if (self.raf) {
-                window.cancelAnimationFrame(self.raf);
+            if (this.raf) {
+                window.cancelAnimationFrame(this.raf);
             }
             if (image.naturalHeight > 0 && image.naturalWidth > 0) {
-
 
                 image.height = image.naturalHeight;
                 image.width = image.naturalWidth;
 
-                window.cancelAnimationFrame(self.raf);
-                self.getOrientedImage(image, (img:HTMLImageElement) => {
+                window.cancelAnimationFrame(this.raf);
+                this.getOrientedImage(image, (img:HTMLImageElement) => {
                     if (this.settings.dynamicSizing) {
                         let canvas:HTMLCanvasElement = this.cropcanvas.nativeElement;
                         this.settings.canvasWidth = canvas.offsetWidth;
@@ -183,20 +182,25 @@ export class ImageCropperComponent implements AfterViewInit, OnChanges, OnDestro
                         this.cropper.resizeCanvas(canvas.offsetWidth, canvas.offsetHeight, false);
                     }
 
-
-                    self.cropper.setImage(img);
-                    if (self.cropPosition && self.cropPosition.isInitialized()) {
-                        self.cropper.updateCropPosition(self.cropPosition.toBounds());
+                    this.cropper.setImage(img);
+                    if (this.cropPosition && this.cropPosition.isInitialized()) {
+                        this.cropper.updateCropPosition(this.cropPosition.toBounds());
                     }
-                    self.image.original = img;
-                    let bounds = self.cropper.getCropBounds();
-                    self.image.image = self.cropper.getCroppedImageHelper().src;
+
+                    this.image.original = img;
+                    let bounds = this.cropper.getCropBounds();
+                    this.image.image = this.cropper.getCroppedImageHelper().src;
+
+                    if (!this.image) {
+                        this.image = image;
+                    }
+
                     if (newBounds != null) {
                         bounds = newBounds;
-                        self.cropper.setBounds(bounds);
+                        this.cropper.setBounds(bounds);
                         this.cropper.updateCropPosition(bounds);
                     }
-                    self.onCrop.emit(bounds);
+                    this.onCrop.emit(bounds);
                 });
             }
         });
