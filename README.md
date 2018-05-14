@@ -1,5 +1,3 @@
-# This repo is deprecated, but will be maintained by web-dave at https://github.com/web-dave/ngx-img-cropper
-
 # ng2-img-cropper
 
 This is an adapatation of Angular 1 image cropper from: https://github.com/AllanBishop/angular-img-cropper
@@ -47,7 +45,7 @@ export class AppComponent {
         this.cropperSettings = new CropperSettings();
         this.cropperSettings.width = 100;
         this.cropperSettings.height = 100;
-        this.cropperSettings.croppedWidth = 100;
+        this.cropperSettings.croppedWidth =100;
         this.cropperSettings.croppedHeight = 100;
         this.cropperSettings.canvasWidth = 400;
         this.cropperSettings.canvasHeight = 300;
@@ -72,8 +70,7 @@ Checkout this [sample plunker](https://embed.plnkr.co/VFwGvAO6MhV06IDTLk5W/)
 * **minHeight**:*number* - Minimum crop height
 * **croppedWidth**:*number* - Resulting image width
 * **croppedHeight**:*number* - Resulting image height
-* **touchRadius**:*number* - (default: 20) Touch devices radius for the corner markers
-* **centerTouchRadius**:*number* (default: 20) - Touch devices radius for the drag center marker
+* **touchRadius**:*number* - (default: 20) Touch devices radius
 * **minWithRelativeToResolution**:*boolean* - (default: true) By default the resulting image will be cropped from original image. If false, it will be cropped from canvas pixels
 * **noFileInput**:*boolean* - (default: false) - hides the file input element from cropper canvas.
 * **cropperDrawSettings**:*CropperDrawSettings* - rendering options
@@ -88,8 +85,6 @@ Checkout this [sample plunker](https://embed.plnkr.co/VFwGvAO6MhV06IDTLk5W/)
 * **croppingClass**: string - appends class to cropper when image is set (#142);
 * **resampleFn**: Function(canvas) - function used to resample the cropped image (#136); - see example #3 from runtime sample app
 * **cropOnResize**:*boolean* (default: true) - if true the cropper will create a new cropped Image object immediately when the crop area is resized
-* **markerSizeMultiplier**:*number* (default: 1) - A variable that control the corner markers' size
-* **showCenterMarker**:*boolean* (default: true) - if true, the drag center marker is visible
 
 ## Customizing Image cropper
 
